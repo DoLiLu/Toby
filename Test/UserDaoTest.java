@@ -1,11 +1,14 @@
-import java.sql.SQLException;
+import Ch1.DaoFactory;
+import Ch1.User;
+import Ch1.UserDao;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import Ch1.*;
+import java.sql.SQLException;
 
 public class UserDaoTest {
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        ConnectionMaker connectionMaker = new NConnectionMaker();
-        UserDao dao = new UserDao(connectionMaker);
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        UserDao dao = context.getBean("userDao", UserDao.class);
 
         User user = new User();
         user.setId("Lee");
