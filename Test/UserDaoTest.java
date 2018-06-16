@@ -4,7 +4,8 @@ import Ch1.*;
 
 public class UserDaoTest {
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        UserDao dao = new DaoFactory().userDao();
+        ConnectionMaker connectionMaker = new NConnectionMaker();
+        UserDao dao = new UserDao(connectionMaker);
 
         User user = new User();
         user.setId("Lee");
