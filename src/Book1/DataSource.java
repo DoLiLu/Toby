@@ -1,4 +1,4 @@
-package Ch1;
+package Book1;
 
 import javax.sql.CommonDataSource;
 import java.sql.Connection;

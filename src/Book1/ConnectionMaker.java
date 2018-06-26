@@ -1,4 +1,4 @@
-package Ch1;
+package Book1;
 
 import java.sql.Connection;
 import java.sql.SQLException;

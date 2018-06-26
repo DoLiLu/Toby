@@ -1,4 +1,4 @@
-package Ch1;
+package Book1;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

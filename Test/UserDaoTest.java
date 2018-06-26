@@ -1,5 +1,5 @@
-import Ch1.User;
-import Ch1.UserDao;
+import Book1.User;
+import Book1.UserDao;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
