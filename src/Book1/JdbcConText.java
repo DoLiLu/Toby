@@ -12,14 +12,14 @@ public class JdbcConText {
         this.dataSource = dataSource;
     }
 
-    public void workWithStatementStrategy(StatementStrategy stmt) throws SQLException {
+    public void workWithStatementStrategy(StatementStrategy stmt) throws SQLException {     // 템플릿
         Connection c = null;
         PreparedStatement ps = null;
 
         try{
             c = dataSource.getConnection();
 
-            ps =stmt.makePreparedStatement(c);
+            ps =stmt.makePreparedStatement(c);                                              // 콜백 호출
 
             ps.executeUpdate();
         } catch (SQLException e){
@@ -31,4 +31,14 @@ public class JdbcConText {
     }
 
 
+    public void executeSql(final String query) throws SQLException {
+        workWithStatementStrategy(
+            new StatementStrategy() {
+                public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                    PreparedStatement ps = c.prepareStatement(query);
+                    return ps;
+                }
+            }
+        );
+    }
 }

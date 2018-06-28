@@ -23,7 +23,7 @@ public class UserDao {
     public void add(final User user) throws SQLException {
         this.jdbcConText.workWithStatementStrategy(
             new StatementStrategy() {
-                public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                public PreparedStatement makePreparedStatement(Connection c) throws SQLException {                  // 콜백 함수 생성 부
                     PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
                     ps.setString(1, user.getId());
                     ps.setString(2, user.getName());
@@ -61,33 +61,8 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException {
-        this.jdbcConText.workWithStatementStrategy(
-            new StatementStrategy() {
-                public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                    PreparedStatement ps = c.prepareStatement("delete from users");
-                    return ps;
-                }
-            }
-        );
+        jdbcConText.executeSql("delete from users");
     }
-
-//    private void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException {
-//        Connection c = null;
-//        PreparedStatement ps = null;
-//
-//        try{
-//            c = dataSource.getConnection();
-//
-//            ps =stmt.makePreparedStatement(c);
-//
-//            ps.executeUpdate();
-//        } catch (SQLException e){
-//            throw e;
-//        } finally {
-//            if (ps != null) { try { ps.close(); } catch (SQLException e) {} }
-//            if (c != null) { try {c.close(); } catch (SQLException e) {} }
-//        }
-//    }
 
 
     public int getCount() throws SQLException  {
