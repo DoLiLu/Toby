@@ -1,4 +1,6 @@
-package Book1;
+package Book1.dao;
+
+import Book1.domain.User;
 
 import java.util.List;
 
@@ -8,4 +10,5 @@ public interface UserDao {
     List<User> getAll();
     void deleteAll();
     int getCount();
+    public void update(User user1);
 }

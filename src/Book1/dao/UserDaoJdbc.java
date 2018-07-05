@@ -1,5 +1,7 @@
-package Book1;
+package Book1.dao;
 
+import Book1.domain.Level;
+import Book1.domain.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -22,6 +24,9 @@ public class UserDaoJdbc implements UserDao {
             user.setId(rs.getString("id"));
             user.setName(rs.getString("name"));
             user.setPassword(rs.getString("password"));
+            user.setLevel(Level.valueOf(rs.getInt("level")));
+            user.setLogin(rs.getInt("login"));
+            user.setRecommend(rs.getInt("recommend"));
             return user;
         }
     };
@@ -40,8 +45,8 @@ public class UserDaoJdbc implements UserDao {
 //            }
 //        );
 //        ==>
-        this.jdbcTemplate.update("insert into users(id, name, password) values (?,?,?)",
-                                        user.getId(), user.getName(), user.getPassword());
+        this.jdbcTemplate.update("insert into users(id, name, password, level, login, recommend) values (?,?,?,?,?,?)",
+                                        user.getId(), user.getName(), user.getPassword(), user.getLevel().intValue(), user.getLogin(), user.getRecommend());
     }
 
     public User get(String id) {
@@ -92,7 +97,6 @@ public class UserDaoJdbc implements UserDao {
         return this.jdbcTemplate.queryForInt("select count(*) from users");
     }
 
-
 //        1. 맨 처음
 //        Connection c = dataSource.getConnection();
 //
@@ -131,4 +135,10 @@ public class UserDaoJdbc implements UserDao {
                 this.userMapper
         );
     }
+    public void update(User user1) {
+        this.jdbcTemplate.update("update users set name = ?, password = ?, level = ?, login = ?, recommend = ? where id = ?",
+                                        user1.getName(), user1.getPassword(), user1.getLevel().intValue(), user1.getLogin(), user1.getRecommend(),
+                                        user1.getId());
+    }
+
 }
