@@ -7,6 +7,7 @@ public class User {
     Level level;
     int login;
     int recommend;
+    String email;
 
     public User(String id, String name, String password, Level level, int login, int recommend) {
         this.id = id;
@@ -62,6 +63,15 @@ public class User {
     public void setRecommend(int recommend) {
         this.recommend = recommend;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public void upgradeLevel() {
         Level nextLevel = this.level.nextLevel();
         if (nextLevel == null) {
