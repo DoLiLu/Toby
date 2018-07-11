@@ -163,7 +163,7 @@ public class UserServiceTest {
     public void add() {
         userDao.deleteAll();
 
-        User userWithLevel = users.get(4);	  // GOLD ����
+        User userWithLevel = users.get(4);	 
         User userWithoutLevel = users.get(0);
         userWithoutLevel.setLevel(null);
 
