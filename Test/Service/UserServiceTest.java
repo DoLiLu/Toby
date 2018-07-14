@@ -3,17 +3,19 @@ package Service;
 import Book1.dao.UserDao;
 import Book1.domain.Level;
 import Book1.domain.User;
+import Book1.service.TxProxyFactoryBean;
 import Book1.service.UserService;
 import Book1.service.UserServiceImpl;
-import Book1.service.UserServiceTx;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -39,6 +41,8 @@ public class UserServiceTest {
     UserServiceImpl userServiceImpl;
     @Autowired MailSender mailSender;
     @Autowired PlatformTransactionManager transactionManager;
+    @Autowired
+    ApplicationContext context;
 
     List<User> users;	// test fixture
 
@@ -163,7 +167,7 @@ public class UserServiceTest {
     public void add() {
         userDao.deleteAll();
 
-        User userWithLevel = users.get(4);	 
+        User userWithLevel = users.get(4);
         User userWithoutLevel = users.get(0);
         userWithoutLevel.setLevel(null);
 
@@ -178,14 +182,16 @@ public class UserServiceTest {
     }
 
     @Test
-    public void upgradeAllOrNothing() {
+    @DirtiesContext
+    public void upgradeAllOrNothing() throws Exception {
         TestUserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(userDao);
         testUserService.setMailSender(mailSender);
 
-        UserServiceTx txUserService = new UserServiceTx();
-        txUserService.setTransactionManager(transactionManager);
-        txUserService.setUserService(testUserService);
+        TxProxyFactoryBean txProxyFactoryBean =
+                context.getBean("&userService", TxProxyFactoryBean.class);
+        txProxyFactoryBean.setTarget(testUserService);
+        UserService txUserService = (UserService) txProxyFactoryBean.getObject();
 
         userDao.deleteAll();
         for(User user : users) userDao.add(user);
@@ -199,7 +205,6 @@ public class UserServiceTest {
 
         checkLevelUpgraded(users.get(1), false);
     }
-
 
     static class TestUserService extends UserServiceImpl {
         private String id;
