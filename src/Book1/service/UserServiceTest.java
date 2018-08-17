@@ -1,4 +1,4 @@
-package Service;
+package Book1.service;
 
 import Book1.dao.UserDao;
 import Book1.domain.Level;
@@ -36,14 +36,11 @@ import static org.mockito.Mockito.*;
 @ContextConfiguration(locations="/applicationContext.xml")
 public class UserServiceTest {
     @Autowired UserService userService;
-    @Autowired
-    UserDao userDao;
-    @Autowired
-    UserServiceImpl userServiceImpl;
+    @Autowired UserService testUserService;
+    @Autowired UserDao userDao;
     @Autowired MailSender mailSender;
     @Autowired PlatformTransactionManager transactionManager;
-    @Autowired
-    ApplicationContext context;
+    @Autowired ApplicationContext context;
 
     List<User> users;	// test fixture
 
@@ -183,22 +180,21 @@ public class UserServiceTest {
     }
 
     @Test
-    @DirtiesContext
     public void upgradeAllOrNothing() throws Exception {
-        TestUserService testUserService = new TestUserService(users.get(3).getId());
-        testUserService.setUserDao(userDao);
-        testUserService.setMailSender(mailSender);
-
-        ProxyFactoryBean txProxyFactoryBean =
-                context.getBean("&userService", ProxyFactoryBean.class);
-        txProxyFactoryBean.setTarget(testUserService);
-        UserService txUserService = (UserService) txProxyFactoryBean.getObject();
+//        TestUserService testUserService = new TestUserService(users.get(3).getId());
+//        testUserService.setUserDao(userDao);
+//        testUserService.setMailSender(mailSender);
+//
+//        ProxyFactoryBean txProxyFactoryBean =
+//                context.getBean("&userService", ProxyFactoryBean.class);
+//        txProxyFactoryBean.setTarget(testUserService);
+//        UserService txUserService = (UserService) txProxyFactoryBean.getObject();
 
         userDao.deleteAll();
         for(User user : users) userDao.add(user);
 
         try {
-            txUserService.upgradeLevels();
+            this.testUserService.upgradeLevels();
             fail("TestUserServiceException expected");
         }
         catch(TestUserServiceException e) {
@@ -207,12 +203,8 @@ public class UserServiceTest {
         checkLevelUpgraded(users.get(1), false);
     }
 
-    static class TestUserService extends UserServiceImpl {
-        private String id;
-
-        private TestUserService(String id) {
-            this.id = id;
-        }
+    static class TestUserServiceImpl extends UserServiceImpl {
+        private String id = "madnite1";
 
         protected void upgradeLevel(User user) {
             if (user.getId().equals(this.id)) throw new TestUserServiceException();
