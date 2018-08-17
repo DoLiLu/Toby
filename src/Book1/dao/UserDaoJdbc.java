@@ -2,6 +2,7 @@ package Book1.dao;
 
 import Book1.domain.Level;
 import Book1.domain.User;
+import Book1.sqlservice.SqlService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -9,13 +10,26 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 
 public class UserDaoJdbc implements UserDao {
+    private Map<String, String> sqlMap;
+
+    public void setSqlMap(Map<String, String> sqlMap) {
+        this.sqlMap = sqlMap;
+    }
+
     private JdbcTemplate jdbcTemplate;
 
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
+    private SqlService sqlService;
+
+    public void setSqlService(SqlService sqlService) {
+        this.sqlService = sqlService;
     }
 
     private RowMapper<User> userMapper = new RowMapper<User>() {
@@ -33,6 +47,7 @@ public class UserDaoJdbc implements UserDao {
 
 
     public void add(final User user) {
+        this.jdbcTemplate.update(this.sqlService.getSql("userAdd"), user.getId(), user.getName(), user.getPassword(), user.getEmail(), user.getLevel().intValue(), user.getLevel(), user.getRecommend());
 //        this.jdbcConText.workWithStatementStrategy(
 //            new StatementStrategy() {
 //                public PreparedStatement makePreparedStatement(Connection c) throws SQLException {                  // 콜백 함수 생성 부
@@ -44,12 +59,17 @@ public class UserDaoJdbc implements UserDao {
 //                }
 //            }
 //        );
+
 //        ==>
-        this.jdbcTemplate.update("insert into users(id, name, password, level, login, recommend) values (?,?,?,?,?,?)",
-                                        user.getId(), user.getName(), user.getPassword(), user.getLevel().intValue(), user.getLogin(), user.getRecommend());
+
+//        this.jdbcTemplate.update("insert into users(id, name, password, level, login, recommend) values (?,?,?,?,?,?)",
+//                                        user.getId(), user.getName(), user.getPassword(), user.getLevel().intValue(), user.getLogin(), user.getRecommend());
+
     }
 
     public User get(String id) {
+        return this.jdbcTemplate.queryForObject(this.sqlService.getSql("userGet"),
+                new Object[] {id}, this.userMapper);
 //        1. 맨 처음
 //        Connection c = this.dataSource.getConnection();
 //        PreparedStatement ps = c
@@ -75,12 +95,22 @@ public class UserDaoJdbc implements UserDao {
 
 //        ==>
 
-        return this.jdbcTemplate.queryForObject("select * from users where id = ?",
-            new Object[] {id}, this.userMapper);
+//        return this.jdbcTemplate.queryForObject("select * from users where id = ?",
+//            new Object[] {id}, this.userMapper);
+    }
+
+    public List<User> getAll() {
+        return this.jdbcTemplate.query(this.sqlService.getSql("userGetAll"),
+                this.userMapper
+        );
+//        return this.jdbcTemplate.query("select * from users order by id",
+//                this.userMapper
+//        );
     }
 
 
     public void deleteAll() {
+        this.jdbcTemplate.update(this.sqlService.getSql("userDeleteAll"));
 //        this.jdbcTemplate.update(
 //            new PreparedStatementCreator() {
 //                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
@@ -89,14 +119,14 @@ public class UserDaoJdbc implements UserDao {
 //            }
 //        );
 //      == >
-        this.jdbcTemplate.update("delete from users");
+//        this.jdbcTemplate.update("delete from users");
     }
 
 
     public int getCount() {
-        return this.jdbcTemplate.queryForInt("select count(*) from users");
+//        return this.jdbcTemplate.queryForInt("select count(*) from users");
+        return this.jdbcTemplate.queryForInt(this.sqlService.getSql("userGetCount"));
     }
-
 //        1. 맨 처음
 //        Connection c = dataSource.getConnection();
 //
@@ -110,11 +140,11 @@ public class UserDaoJdbc implements UserDao {
 //        ps.close();
 //        c.close();
 //
+
 //        return count;
-
 //        ==>
-//        2. 콜백 함수 생략 X
 
+//        2. 콜백 함수 생략 X
 //        return this.jdbcTemplate.query(
 //            new PreparedStatementCreator() {
 //                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
@@ -126,19 +156,17 @@ public class UserDaoJdbc implements UserDao {
 //                    return rs.getInt(1);
 //                }
 //            }
+
 //        );
 
 //        ==>  콜백 함수 생략 후 최종 쿼리 = 주석 X 코드
-
-    public List<User> getAll() {
-        return this.jdbcTemplate.query("select * from users order by id",
-                this.userMapper
-        );
-    }
     public void update(User user1) {
-        this.jdbcTemplate.update("update users set name = ?, password = ?, level = ?, login = ?, recommend = ? where id = ?",
+        this.jdbcTemplate.update(this.sqlService.getSql("userUpdate"),
                                         user1.getName(), user1.getPassword(), user1.getLevel().intValue(), user1.getLogin(), user1.getRecommend(),
                                         user1.getId());
+//        this.jdbcTemplate.update("update users set name = ?, password = ?, level = ?, login = ?, recommend = ? where id = ?",
+//                                        user1.getName(), user1.getPassword(), user1.getLevel().intValue(), user1.getLogin(), user1.getRecommend(),
+//                                        user1.getId());
     }
 
 }
